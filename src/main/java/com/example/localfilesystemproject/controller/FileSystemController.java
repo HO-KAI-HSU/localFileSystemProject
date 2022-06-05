@@ -74,26 +74,45 @@ public class FileSystemController {
         }
     }
 
-    @PostMapping("/file")
-    public String handleFileUpload(@RequestParam("file") MultipartFile file,
+    @RequestMapping(value = {
+            "file",
+            "file/{localFileSystemPath}/**"
+    }, method=RequestMethod.POST)
+    public String handleFileUpload(@PathVariable(required = false) String localFileSystemPath, HttpServletRequest request, @RequestParam("file") MultipartFile file,
                                    RedirectAttributes redirectAttributes) {
+        String requestURI = request.getRequestURI();
+        String filePath = filePathService.arrangeFilePath(requestURI).equals("") ? "" : filePathService.arrangeFilePath(requestURI) + "/";
         Boolean rs = storageService.isEmptyFile(file);
         if (rs) {
             return "File empty!!";
         }
-        rs = storageService.isExistedFile(file.getOriginalFilename());
+        rs = storageService.isExistedFile(filePath + file.getOriginalFilename());
         if (rs) {
             return "File existed not allow to operate";
         }
-        storageService.store(file);
+
+        Path pathLoad = storageService.load(filePath);
+        File fileLoad = pathLoad.toFile();
+        if (fileLoad.exists() && fileLoad.isDirectory()) {
+            storageService.store(file, filePath);
+        } else {
+            throw new StorageFileNotFoundException("Could not read file: " + filePath);
+        }
+
         redirectAttributes.addFlashAttribute("message",
                 "You successfully uploaded " + file.getOriginalFilename() + "!");
         return "File is Uploaded";
     }
 
-    @PatchMapping("/file")
-    public String handleFileUpdate(@RequestParam("file") MultipartFile file,
+    @RequestMapping(value = {
+            "file",
+            "file/{localFileSystemPath}/**"
+    }, method=RequestMethod.PATCH)
+    public String handleFileUpdate(@PathVariable(required = false) String localFileSystemPath, HttpServletRequest request, @RequestParam("file") MultipartFile file,
                                    RedirectAttributes redirectAttributes) throws IOException {
+        String requestURI = request.getRequestURI();
+        String filePath = filePathService.arrangeFilePath(requestURI).equals("") ? "" : filePathService.arrangeFilePath(requestURI) + "/";
+
         Boolean rs = storageService.isEmptyFile(file);
         if (rs) {
             return "File empty!!";
@@ -102,7 +121,15 @@ public class FileSystemController {
         if (!rs) {
             return "File is not existed not allow to operate";
         }
-        storageService.update(file);
+
+        Path pathLoad = storageService.load(filePath);
+        File fileLoad = pathLoad.toFile();
+        if (fileLoad.exists() && fileLoad.isDirectory()) {
+            storageService.update(file, filePath);
+        } else {
+            throw new StorageFileNotFoundException("Could not read file: " + filePath);
+        }
+
         redirectAttributes.addFlashAttribute("message",
                 "You successfully uploaded " + file.getOriginalFilename() + "!");
         return "File is Updated";

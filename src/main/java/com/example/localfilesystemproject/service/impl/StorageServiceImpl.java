@@ -10,6 +10,7 @@ import com.example.localfilesystemproject.storage.StorageProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,7 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -37,15 +37,23 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public void store(MultipartFile file) {
+    @Async("executor")
+    public void store(MultipartFile file, String filePath) {
         try {
             if (file.isEmpty()) {
                 throw new StorageException("Failed to store empty file.");
             }
-            Path destinationFile = this.rootLocation.resolve(
+            Path path;
+            if (filePath.equals("")) {
+                path = this.rootLocation;
+            } else {
+                path = this.rootLocation.resolve(filePath);
+            }
+            Path destinationFile = path.resolve(
                             Paths.get(file.getOriginalFilename()))
                     .normalize().toAbsolutePath();
-            if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
+
+            if (!destinationFile.getParent().equals(path.toAbsolutePath())) {
                 throw new StorageException(
                         "Cannot store file outside current directory.");
             }
@@ -60,12 +68,14 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public void update(MultipartFile file) throws IOException {
-        deleteFile(file.getOriginalFilename());
-        store(file);
+    @Async("executor")
+    public void update(MultipartFile file, String filePath) throws IOException {
+        deleteFile(filePath + file.getOriginalFilename());
+        store(file, filePath);
     }
 
     @Override
+    @Async("executor")
     public Stream<Path> loadAll() {
         try {
             return Files.walk(this.rootLocation, 5)
@@ -87,6 +97,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    @Async("executor")
     public Boolean isExistedFile(String filename) {
         Boolean rs = false;
         try {
@@ -103,6 +114,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    @Async("executor")
     public Boolean isEmptyFile(MultipartFile file) {
         Boolean rs = false;
         if (file.isEmpty()) {
@@ -113,6 +125,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    @Async("executor")
     public Resource loadAsResource(String filename) {
         try {
             Path file = load(filename);
@@ -131,6 +144,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    @Async("executor")
     public LoadAsDirectoryDto loadAsDirectory(String filename, String orderBy, String orderByDirection, String filterName) {
         List<String> listDir = new ArrayList<String>();
         LoadAsDirectoryDto loadAsDirectoryDto = new LoadAsDirectoryDto();
@@ -149,11 +163,13 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    @Async("executor")
     public void deleteAll() {
         FileSystemUtils.deleteRecursively(rootLocation.toFile());
     }
 
     @Override
+    @Async("executor")
     public void deleteFile(String filename) throws IOException {
         try {
             Path file = load(filename);
@@ -165,6 +181,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    @Async("executor")
     public void init() {
         try {
             Files.createDirectories(rootLocation);
