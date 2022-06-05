@@ -1,0 +1,10 @@
+version: "3"
+services:
+  eloquent_vaughan:
+     build:
+       context: .
+       dockerfile: Dockerfile
+     restart: unless-stopped
+     ports:
+      - "8080:8080"
+     container_name: fileSystem_V01
