@@ -83,11 +83,11 @@ public class FileSystemController {
         String requestURI = request.getRequestURI();
         String filePath = filePathService.arrangeFilePath(requestURI).equals("") ? "" : filePathService.arrangeFilePath(requestURI) + "/";
         Boolean rs = storageService.isEmptyFile(file);
-        if (rs) {
+        if (rs != null && rs) {
             return "File empty!!";
         }
         rs = storageService.isExistedFile(filePath + file.getOriginalFilename());
-        if (rs) {
+        if (rs != null && rs) {
             return "File existed not allow to operate";
         }
 

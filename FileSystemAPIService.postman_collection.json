@@ -1,0 +1,140 @@
+{
+	"info": {
+		"_postman_id": "7958d600-c0d3-4005-8618-146730c57601",
+		"name": "FileSystemAPIService",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8080/file",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/Users/georgehsu/Desktop/履歷/e136203eff1017a1.jpeg"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/file",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"file"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/file/e136203eff1017a1.jpeg",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/file/e136203eff1017a1.jpeg",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"file",
+						"e136203eff1017a1.jpeg"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/file",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/Users/georgehsu/Desktop/履歷/e136203eff1017a1.jpeg"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/file",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"file"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/file/aaa",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/file/e136203eff1017a1.jpeg",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"file",
+						"e136203eff1017a1.jpeg"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/file?orderBy=lastModified&orderByDirectionEnum=Descending",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/file?orderBy=lastModified&orderByDirection=Descending&filterByName=",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"file"
+					],
+					"query": [
+						{
+							"key": "orderBy",
+							"value": "lastModified"
+						},
+						{
+							"key": "orderByDirection",
+							"value": "Descending"
+						},
+						{
+							"key": "filterByName",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
